@@ -1,32 +1,34 @@
 # EMBERFALL
 
-[![make.fun](https://make.fun/badge/best-game-01.svg)](https://make.fun/bounty/best-game-01)
+A neon arena survival game. Steer a glowing ember spirit through waves of neon enemies, chain
+kills for a combo multiplier, dash through danger, and face the Ember Lord boss every five waves.
+
+[![Bounty](https://make.fun/badge/best-game-01.svg)](https://make.fun/bounty/best-game-01)
 [![Rank](https://make.fun/badge/best-game-01/Sipalingtesnet/best-game-01-entry/rank.svg)](https://make.fun/bounty/best-game-01)
 [![Reward](https://make.fun/badge/best-game-01/Sipalingtesnet/best-game-01-entry/reward.svg)](https://make.fun/bounty/best-game-01)
 
-**EMBERFALL** is a high-octane neon arena survival game built for the make.fun competition. Fight off relentless waves of void embers, splitters, tanks, and the dreaded Ember Lord boss in a glowing crucible of fire and particle effects.
+## How to play
 
-## How to Run
-
-```bash
-# Install dependencies if needed or run with Node 22+
-node serve.ts
-# Open http://localhost:8080 in your browser
-```
+Survive the ember horde. Enemies spawn at the arena edges in waves. Kill them to score points;
+chain kills without taking damage to build a combo multiplier. Pickups drop from kills — health,
+shield, rapid fire and bombs. A boss appears every 5 waves.
 
 ## Controls
 
-| Action | Key / Input |
-| :--- | :--- |
-| **Move** | `W` `A` `S` `D` or Arrow Keys |
-| **Aim** | Mouse Cursor |
-| **Fire** | Left Mouse Click or `Space` |
-| **Dash** | `Shift` or Right Mouse Click |
-| **Bomb** | `Q` |
-| **Pause** | `P` |
-| **Mute** | `M` |
-| **Restart** | `R` |
+- **Move** — WASD or Arrow keys
+- **Aim** — Mouse
+- **Shoot** — Hold left click or Space
+- **Dash** — Shift or right-click (brief invulnerability, cooldown)
+- **Pause** — P or Escape
+- **Mute** — M
+- **Restart** — R (on game over)
 
-## Screenshots
+You have 3 hearts. Game over at 0. Your best score is saved in this browser.
 
-Captured automatically during gameplay.
+## Run it
+
+```
+node serve.ts
+```
+
+Then open http://localhost:8080.

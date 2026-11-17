@@ -4,6 +4,7 @@ import { createEnemies, spawnEnemy, spawnBoss, stepEnemy } from './enemies.js';
 import { createParticles } from './particles.js';
 import { sfx, stopMusic } from './audio.js';
 import { pick } from './random.js';
+import { ACTION_DASH } from './input.js';
 
 export const ACTION_BOMB = 32;
 

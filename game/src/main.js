@@ -59,13 +59,13 @@ window.addEventListener('keydown', function (e) {
 function runShot(name) {
   stageShot(name, state);
   if (name === 'start') {
-    renderer.draw(state, SCREEN_TITLE);
+    renderer.draw(state, SCREEN_TITLE, state.best);
   } else if (name === 'play') {
-    renderer.draw(state, SCREEN_PLAY);
+    renderer.draw(state, SCREEN_PLAY, state.best);
   } else if (name === 'boss') {
-    renderer.draw(state, SCREEN_PLAY);
+    renderer.draw(state, SCREEN_PLAY, state.best);
   } else if (name === 'end') {
-    renderer.draw(state, SCREEN_OVER);
+    renderer.draw(state, SCREEN_OVER, state.best);
   }
   updateStatus();
 }
@@ -111,9 +111,9 @@ function runGame() {
       acc -= STEP;
       if (!paused && state.phase === 'play') {
         const inp = {
-          move: input.move,
-          aim: input.aim,
-          firing: input.firing,
+          move: input.move(),
+          aim: input.aim(),
+          firing: input.firing(),
           actions: actions,
           bomb: bombQueued
         };
@@ -131,7 +131,7 @@ function runGame() {
     if (state.phase === 'title') screen = SCREEN_TITLE;
     else if (state.phase === 'over') screen = SCREEN_OVER;
     else if (paused) screen = SCREEN_PAUSED;
-    renderer.draw(state, screen);
+    renderer.draw(state, screen, state.best);
     updateStatus();
     requestAnimationFrame(frame);
   }
