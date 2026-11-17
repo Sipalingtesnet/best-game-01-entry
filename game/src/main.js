@@ -50,23 +50,26 @@ function updateStatus() {
     lastStatus = text;
     statusEl.textContent = text;
   }
-}const input = createInput(canvas);
+}
+const input = createInput(canvas);
 let bombQueued = false;
 window.addEventListener('keydown', function (e) {
   if (e.key === 'q' || e.key === 'Q') bombQueued = true;
 });
 
 function runShot(name) {
-  stageShot(name, state);
-  if (name === 'start') {
-    renderer.draw(state, SCREEN_TITLE, state.best);
-  } else if (name === 'play') {
-    renderer.draw(state, SCREEN_PLAY, state.best);
-  } else if (name === 'boss') {
-    renderer.draw(state, SCREEN_PLAY, state.best);
-  } else if (name === 'end') {
-    renderer.draw(state, SCREEN_OVER, state.best);
+  const scene = stageShot(name, state);
+  let painted = 0;
+  function paint() {
+    renderer.draw(state, scene.screen, scene.best);
+    painted += 1;
+    if (painted < 2) {
+      requestAnimationFrame(paint);
+    } else {
+      window.__shotReady = true;
+    }
   }
+  requestAnimationFrame(paint);
   updateStatus();
 }
 

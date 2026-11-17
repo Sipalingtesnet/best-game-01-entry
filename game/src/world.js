@@ -30,6 +30,8 @@ export function createWorld(random) {
     spawnTimer: 0,
     toSpawn: [],
     bossActive: false,
+    bossHp: 0,
+    bossMaxHp: 0,
     bombs: 1,
     waveBanner: '',
     waveBannerTimer: 0,
@@ -85,6 +87,8 @@ function killEnemy(state, e) {
 
   if (e.kind === 'boss') {
     state.bossActive = false;
+    state.bossHp = 0;
+    state.bossMaxHp = 0;
   }
 }
 
@@ -104,6 +108,7 @@ export function useBomb(state) {
     if (distSq <= BOMB.radius * BOMB.radius) {
       e.hp -= BOMB.damage;
       e.flash = 0.15;
+      if (e.boss) state.bossHp = e.hp;
       if (e.hp <= 0) {
         killEnemy(state, e);
       }
@@ -170,6 +175,7 @@ export function stepWorld(state, dt, input) {
         hit = true;
         e.hp -= b.damage;
         e.flash = 0.08;
+        if (e.boss) state.bossHp = e.hp;
         state.particles.burst(b.x, b.y, '#ff7a3c', 4, 120, 3, 0.2);
         if (e.hp <= 0) {
           killEnemy(state, e);
@@ -334,7 +340,11 @@ export function stepWorld(state, dt, input) {
       if (state.toSpawn.length > 0) {
         const kind = state.toSpawn.shift();
         if (kind === 'boss') {
-          spawnBoss(state.enemies, state.wave);
+          const boss = spawnBoss(state.enemies, state.wave);
+          if (boss) {
+            state.bossHp = boss.hp;
+            state.bossMaxHp = boss.hp;
+          }
         } else {
           spawnEnemy(state.enemies, state.random, kind, state.wave);
         }
