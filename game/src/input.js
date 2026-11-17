@@ -1,47 +1,104 @@
-// Keyboard and pointer input. Held keys give a steering direction; one-shot presses (start or
-// restart, pause) are queued as bit flags and taken once by the loop, so a press between two
-// frames is never lost and never counted twice.
+// Keyboard and pointer input. Held keys give a movement vector; the mouse gives an aim point;
+// one-shot presses (start, pause, dash, mute, restart) are queued as bit flags and taken once
+// by the loop, so a press between two frames is never lost and never counted twice.
 
 export const ACTION_CONFIRM = 1;
 export const ACTION_PAUSE = 2;
+export const ACTION_DASH = 4;
+export const ACTION_MUTE = 8;
+export const ACTION_RESTART = 16;
 
 const LEFT = new Set(['ArrowLeft', 'KeyA']);
 const RIGHT = new Set(['ArrowRight', 'KeyD']);
+const UP = new Set(['ArrowUp', 'KeyW']);
+const DOWN = new Set(['ArrowDown', 'KeyS']);
 const CONFIRM = new Set(['Space', 'Enter']);
 const PAUSE = new Set(['KeyP', 'Escape']);
+const DASH = new Set(['ShiftLeft', 'ShiftRight']);
+const MUTE = new Set(['KeyM']);
+const RESTART = new Set(['KeyR']);
 
 export function createInput(target) {
   let left = false;
   let right = false;
+  let up = false;
+  let down = false;
+  let firing = false;
   let actions = 0;
+  let aimX = 640;
+  let aimY = 360;
 
   window.addEventListener('keydown', (event) => {
     if (LEFT.has(event.code)) left = true;
     else if (RIGHT.has(event.code)) right = true;
+    else if (UP.has(event.code)) up = true;
+    else if (DOWN.has(event.code)) down = true;
     else if (CONFIRM.has(event.code)) {
       if (!event.repeat) actions |= ACTION_CONFIRM;
     } else if (PAUSE.has(event.code)) {
       if (!event.repeat) actions |= ACTION_PAUSE;
+    } else if (DASH.has(event.code)) {
+      if (!event.repeat) actions |= ACTION_DASH;
+    } else if (MUTE.has(event.code)) {
+      if (!event.repeat) actions |= ACTION_MUTE;
+    } else if (RESTART.has(event.code)) {
+      if (!event.repeat) actions |= ACTION_RESTART;
     } else return;
     event.preventDefault();
   });
   window.addEventListener('keyup', (event) => {
     if (LEFT.has(event.code)) left = false;
     else if (RIGHT.has(event.code)) right = false;
+    else if (UP.has(event.code)) up = false;
+    else if (DOWN.has(event.code)) down = false;
   });
   // A key released while the tab is hidden never sends keyup: let go of everything on blur.
   window.addEventListener('blur', () => {
     left = false;
     right = false;
-  });
-  target.addEventListener('pointerdown', () => {
-    actions |= ACTION_CONFIRM;
+    up = false;
+    down = false;
+    firing = false;
   });
 
+  function pointerPos(event) {
+    const rect = target.getBoundingClientRect();
+    aimX = event.clientX - rect.left;
+    aimY = event.clientY - rect.top;
+  }
+
+  target.addEventListener('pointermove', (event) => {
+    pointerPos(event);
+  });
+  target.addEventListener('pointerdown', (event) => {
+    pointerPos(event);
+    if (event.button === 2) {
+      actions |= ACTION_DASH;
+    } else {
+      firing = true;
+      actions |= ACTION_CONFIRM;
+    }
+  });
+  target.addEventListener('pointerup', (event) => {
+    if (event.button !== 2) firing = false;
+  });
+  target.addEventListener('contextmenu', (event) => event.preventDefault());
+
   return {
-    /** -1 for left, 1 for right, 0 for neither or both. */
-    direction() {
-      return (right ? 1 : 0) - (left ? 1 : 0);
+    /** The movement vector, each axis -1, 0 or 1. */
+    move() {
+      return {
+        x: (right ? 1 : 0) - (left ? 1 : 0),
+        y: (down ? 1 : 0) - (up ? 1 : 0),
+      };
+    },
+    /** Whether the fire button is held. */
+    firing() {
+      return firing;
+    },
+    /** The aim point in arena coordinates. */
+    aim() {
+      return { x: aimX, y: aimY };
     },
     /** The one-shot presses since the last call, as ACTION_* flags. */
     takeActions() {
